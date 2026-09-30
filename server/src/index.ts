@@ -54,11 +54,22 @@ app.get('/api/health', (req, res) => {
 // Mount translate routes
 app.use('/api', translateRouter);
 
+// Serve static frontend files if client build exists (Production / Deployment)
+import fs from 'fs';
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
 // Start server
 app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`🚀 Translation Backend Server is running!`);
   console.log(`📍 URL: http://localhost:${PORT}`);
-  console.log(`🔑 Google Cloud API Key: ${process.env.GOOGLE_TRANSLATE_API_KEY ? 'Configured ✅' : 'Not set (Using MyMemory Real Translation API) 🌐'}`);
+  console.log(`🔑 Google Cloud API Key: ${process.env.GOOGLE_TRANSLATE_API_KEY ? 'Configured ✅' : 'Not set (Using Real Live Translation Engine) 🌐'}`);
   console.log(`====================================================`);
 });
+
